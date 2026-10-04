@@ -50,6 +50,8 @@ const OPS=['ATL','DAL','GB','KC','SF','PIT','MIA','SEA'],TC=[{j:'#f2f2f2',h:'#e8
 const AUD=['DEEP','SHORT','MIX'];
 const ROUTES=[[[[28,0]],[[10,0],[26,10]],[[12,0],[28,-14]],[[2,6]]],[[[6,0],[8,-4]],[[5,0],[9,8]],[[8,0],[6,-3]],[[3,8],[9,10]]],[[[10,0],[22,6]],[[4,0],[12,-8]],[[18,0]],[[4,-8]]]];
 const eo=(t,i)=>t[i].ovr-(t[i].inj?15:0);
+const A=(t,i,k)=>{const a=t[i];if(!a.at)ens(a);return a.at[k]-(a.inj?15:0)};
+const FZ=(t,i)=>1-Math.min(.2,((g&&g.snaps)||0)*.0035*(1-A(t,i,3)/115));
 let G,g=null,p=null,cam=50,tab='Roster',tt;
 function genFA(){G.fa=[...Array(6)].map(()=>{const i=RI(0,7),pl=mkP(SL[i],RI(65,86));pl.i=i;pl.cost=(pl.ovr-55)*4;return pl})}
 function genDr(){G.dr=[...Array(6)].map(()=>{const i=RI(0,7),pl=mkP(SL[i],RI(58,84));pl.i=i;return pl})}
@@ -168,26 +170,26 @@ p.rec=[...p.wr,p.rb];bar()}
 function bar(){let h='';if(p.st=='pre'){const d=100-g.ball+17;if(g.down==4)h=`<button onclick=punt()>PUNT</button>`+(d<=60?`<button onclick=fg()>FG ${d}yd</button>`:'')+`<button onclick=snap()>GO FOR IT</button>`;else h='<button onclick=snap()>SNAP</button>';h+=`<button onclick=snap(1)>RUN</button><button onclick=aud()>CHANGE PLAY: ${AUD[g.set]}</button>`+(g.to[g.poss]>0?`<button onclick=tmo()>TIMEOUT (${g.to[g.poss]})</button>`:'');if((g.q==2||g.q==4)&&g.clock<=20&&g.ball>=50&&g.down<4&&d<=60&&!g.conv)h=`<span>⏱ ${Math.ceil(g.clock)}s LEFT! Kick the FG or run another play?</span><button onclick=fg()>KICK FG ${d}yd</button>`+h}else if(p.st=='live')h='<span>Drag / tap the field to throw!</span>';else if(p.st=='run')h='<span>↑ ↓ keys move the runner</span><button onpointerdown="keys.u=1" onpointerup="keys.u=0" onpointerleave="keys.u=0">▲</button><button onpointerdown="keys.d=1" onpointerup="keys.d=0" onpointerleave="keys.d=0">▼</button>';$('bar').innerHTML=h}
 function aud(){g.set=(g.set+1)%3;bar()}
 function snap(run){if(kk||p.st!='pre')return;if(g.poss==0&&G.morale<40&&Math.random()<.07){toast('PENALTY! -5 yds');g.ball=Math.max(1,g.ball-5);g.togo+=5;return setup()}
-p.st=run?'run':'live';p.kind=run?'run':'pass';p.t=0;if(run){p.car=p.rb;p.hd=.4}bar()}
+g.snaps=(g.snaps||0)+1;p.st=run?'run':'live';p.kind=run?'run':'pass';p.t=0;if(run){p.car=p.rb;p.hd=.4}bar()}
 function punt(){const b=g.ball+RI(36,52);tick(8);toast('PUNT');change(1-g.poss,b>=100?20:100-b);next()}
 let kk=null;
-const kprob=d=>cl(1-(d-20)*.013+(eo(g.teams[g.poss],7)-70)*.004+g.wind*.006-Math.abs(g.wind)*.004,.03,.97);
+const kprob=d=>{const t=g.teams[g.poss];return cl(1-(d-20)*.013*(1.54-A(t,7,1)/130)+(A(t,7,0)-70)*.004+g.wind*.006-Math.abs(g.wind)*.004,.03,.97)};
 function kg(d,name,done){kk={t:R(0,3),d,done,sp:2+d/25};$('bar').innerHTML=`<div class=mt><i id=mk></i></div><button onclick=kickStop()>KICK!</button><span>${name} ${d}yd: stop the marker in the green!</span>`}
-function kickStop(){if(!kk)return;const e=Math.abs(Math.sin(kk.t*kk.sp)),pr=kprob(kk.d)*cl(1.15-e*1.1,.1,1.05)+(e<.1?.08:0),ok=Math.random()<cl(pr,.02,.99),c=kk;kk=null;$('bar').innerHTML='';c.done(ok)}
+function kickStop(){if(!kk)return;const e=Math.abs(Math.sin(kk.t*kk.sp))*(1.55-A(g.teams[g.poss],7,2)/130),pr=kprob(kk.d)*cl(1.15-e*1.1,.1,1.05)+(e<.1?.08:0),ok=Math.random()<cl(pr,.02,.99),c=kk;kk=null;$('bar').innerHTML='';c.done(ok)}
 function fg(){if(kk)return;const d=100-g.ball+17,pos=g.poss;tick(6);const s=S();if(s)s.fga++;
 kg(d,'FIELD GOAL',ok=>{if(ok){if(s)s.fgm++;g.score[pos]+=3;toast('FIELD GOAL IS GOOD!');cheer();ko(1-pos)}else{toast('FIELD GOAL MISSED');change(1-pos,Math.max(20,100-g.ball))}next()})}
 function xp(pos){p.st='done';$('bar').innerHTML=`<button onclick="xk(${pos})">KICK EXTRA POINT</button><button onclick="x2(${pos})">GO FOR 2</button>`}
 function xk(pos){kg(33,'EXTRA POINT',ok=>{if(ok){g.score[pos]+=1;toast('EXTRA POINT IS GOOD')}else toast('EXTRA POINT MISSED');ko(1-pos);next()})}
 function x2(pos){g.conv=true;g.ball=98;g.down=1;g.togo=2;g.set=0;setup();toast('TWO-POINT TRY: 2 yard line!')}
-function ko(i){const t=g.teams[i],o=eo(t,i==0?(G.kr??4):4),tb=Math.random()<.22;
+function ko(i){const t=g.teams[i],ki=i==0?(G.kr??4):4,o=ki<5?A(t,ki,ki==0?2:1):eo(t,ki),tb=Math.random()<.22;
 if(!tb&&Math.random()<.015+Math.max(0,o-70)/1500){g.score[i]+=7;toast('KICK RETURN TOUCHDOWN!',1);cheer();return ko(1-i)}
 const y=tb?25:cl(Math.round(RI(15,32)+(o-70)/3+(Math.random()<.06?RI(25,55):0)),10,60);change(i,y);toast(tb?'TOUCHBACK':'KICK RETURN: '+y+' yds',1)}
 function tmo(){if(kk||p.st!='pre'||g.to[g.poss]<1)return;g.to[g.poss]--;g.tos=true;toast('TIMEOUT '+g.names[g.poss]);bar()}
 function kr(i){G.kr=i;save();alert(G.team[i].name+' is now your kick returner.');pl(i)}
 function change(np,b){g.poss=np;g.ball=b;g.down=1;g.togo=10;g.set=0}
-function tick(s){g.clock-=s;if(g.clock<=0){if(g.q>=4){g.over=true;g.clock=0}else{g.q++;g.clock=120;if(g.q==3)g.to=[3,3]}}}
+function tick(s){g.clock-=s;if(g.clock<=0){if(g.q>=4){g.over=true;g.clock=0}else{g.q++;g.clock=120;if(g.q==3){g.to=[3,3];g.snaps=0}}}}
 function next(){p.st='done';bar();setTimeout(()=>{if(g.over)return endGame();let n=0;while(g.poss==1&&!g.p2&&!g.over&&n++<5)simDrive();if(g.over)return endGame();setup()},900)}
-function simDrive(){const o=g.teams[1],d=g.teams[0],os=av([0,1,2,3,4,5].map(i=>eo(o,i))),ds=(eo(d,6)*2+eo(d,5))/3,pr=cl(.27+(os-ds)/110,.08,.6),r=Math.random();let m,b=RI(26,40);tick(RI(25,60));
+function simDrive(){const o=g.teams[1],d=g.teams[0],os=av([0,1,2,3,4,5].map(i=>eo(o,i))),ds=(A(d,6,0)+A(d,6,1)+A(d,5,0))/3,pr=cl(.27+(os-ds)/110,.08,.6),r=Math.random();let m,b=RI(26,40);tick(RI(25,60));
 if(r<pr){g.score[1]+=7;m=g.names[1]+' scored a TD!';b=25}else if(r<pr+.15){g.score[1]+=3;m=g.names[1]+' kicked a FG';b=25}else m=g.names[1]+' drive stalled';
 toast(m);if(b==25)ko(0);else{change(0,b);toast('Your ball at your '+b,1)}}
 function endPlay(gain,o={}){if(p.st=='done')return;if(g.conv){g.conv=false;p.st='done';const pc=g.poss,ok=!o.to&&(o.td||g.ball+gain>=100);if(ok){g.score[pc]+=2;toast('TWO-POINT CONVERSION IS GOOD!');cheer()}else toast('TWO-POINT TRY STOPPED!');ko(1-pc);return next()}stat(gain,o);const pos=g.poss;tick(g.tos?3:o.inc?4:o.oob?RI(3,7):RI(6,13)+5);g.tos=false;let m=o.msg||'';
@@ -208,32 +210,32 @@ ui(h+'<button onclick="menu()">CONTINUE</button>');p=null;g=null}
 /* update */
 const mv=(o,tx,ty,s)=>{const dx=tx-o.x,dy=ty-o.y,d=Math.hypot(dx,dy);if(d<=s){o.x=tx;o.y=ty;return true}o.x+=dx/d*s;o.y+=dy/d*s;return false};
 const defs=()=>[...p.rush,...p.cov,p.saf];
-function upd(dt){if(!g||!p||!['live','ball','run'].includes(p.st))return;p.t+=dt;const D=eo(p.d,6),hd=g.poss==0&&!g.p2?DF():{sp:1,rd:0},dsp=5.4*(.85+D/300)*dt*hd.sp;
-if(p.st=='run'){if(p.t>p.hd){const c=p.car,oc=eo(p.o,c.i==4?4:c.i),ol=eo(p.o,5);let nd=null,nm=99;for(const e of defs()){const d=Math.hypot(e.x-c.x,e.y-c.y);if(e.x>c.x-1&&d<nm){nm=d;nd=e}}
-const ky=keys.d-keys.u;if(ky)c.y+=ky*9*dt;else if(nd&&nm<5)c.y=cl(c.y+(c.y>nd.y?1:-1)*1.6*dt,2,51);c.x+=(p.scr?5.8:p.kind=='run'?6.4:7.4)*(.85+oc/300)*dt*(c.inv>0?.5:1);
+function upd(dt){if(!g||!p||!['live','ball','run'].includes(p.st))return;p.t+=dt;const D=eo(p.d,6),Dt=A(p.d,6,0),hd=g.poss==0&&!g.p2?DF():{sp:1,rd:0},dsp=5.4*(.85+A(p.d,6,2)/300)*dt*hd.sp*FZ(p.d,6);
+if(p.st=='run'){if(p.t>p.hd){const c=p.car,oc=eo(p.o,c.i==4?4:c.i),ol=(A(p.o,5,0)+A(p.o,5,1))/2,sd=A(p.o,c.i,c.i==0?2:1),bk=c.i==0?eo(p.o,0):A(p.o,c.i,2),fz=FZ(p.o,c.i);let nd=null,nm=99;for(const e of defs()){const d=Math.hypot(e.x-c.x,e.y-c.y);if(e.x>c.x-1&&d<nm){nm=d;nd=e}}
+const ky=keys.d-keys.u;if(ky)c.y+=ky*9*dt;else if(nd&&nm<5)c.y=cl(c.y+(c.y>nd.y?1:-1)*1.6*dt,2,51);c.x+=(p.scr?5.8:p.kind=='run'?6.4:7.4)*(.85+sd/300)*fz*dt*(c.inv>0?.5:1);
 if(c.x>=100)return endPlay(100-p.los,{td:1});if(c.y<1||c.y>52)return endPlay(Math.round(c.x-p.los),{oob:1,msg:'OUT OF BOUNDS!'});
-const rate=cl(4.5-oc/30+(D-ol)/40,1.2,5)*(g.poss==0&&!g.p2?(p.kind=='run'?1+(DF().tk-1)*.3:DF().tk):1)*(p.scr?(c.x<p.los-.5?.2:1):p.kind=='run'?(c.x<p.los-.5?.15:c.x<p.los+5?.35:.3):1);
+const rate=cl(4.5-oc/30+(Dt-ol)/40,1.2,5)*(g.poss==0&&!g.p2?(p.kind=='run'?1+(DF().tk-1)*.3:DF().tk):1)*(p.scr?(c.x<p.los-.5?.2:1):p.kind=='run'?(c.x<p.los-.5?.15:c.x<p.los+5?.35:.3):1);
 if(c.inv>0)c.inv-=dt;
 const R2=p.kind=='run'?1.9:1.4,nc=defs().filter(e=>Math.hypot(e.x-c.x,e.y-c.y)<R2).length;
-if(!(c.inv>0)&&nc&&Math.random()<dt*rate*(p.kind=='run'?1+.25*(nc-1):nc)){if(p.kind=='run'&&Math.random()>cl(.72+(D-oc)/150,.4,.95)){c.inv=.45}else{if(g.poss==0&&G.morale<40&&Math.random()<.1)return endPlay(Math.round(c.x-p.los),{to:1,msg:'FUMBLE!'});return endPlay(Math.round(c.x-p.los))}}}
+if(!(c.inv>0)&&nc&&Math.random()<dt*rate*(p.kind=='run'?1+.25*(nc-1):nc)){if(p.kind=='run'&&Math.random()>cl(.72+(Dt-bk)/150,.4,.95)){c.inv=.45}else{if(g.poss==0&&G.morale<40&&Math.random()<.1)return endPlay(Math.round(c.x-p.los),{to:1,msg:'FUMBLE!'});return endPlay(Math.round(c.x-p.los))}}}
 else if(c=p.car){c.x=Math.max(c.x-3*dt,p.los-8)}
 if(p.t>p.hd||p.car.i!=4)for(const e of defs()){const db=e===p.saf||p.cov.includes(e);mv(e,p.car.x+Math.min(3,Math.hypot(e.x-p.car.x,e.y-p.car.y)*.25),p.car.y,dsp*(p.kind=='pass'?(db?1.22:1.08):p.kind=='run'?1.2:(p.car.i==4?1:1.05)))}
 else for(const e of p.rush)mv(e,p.car.x,p.car.y,dsp*.9);return}
 /* passing */
-const sp=r=>6.4*(.8+eo(p.o,r.i)/250)*dt,rt=ROUTES[g.set];let ch=null;if(p.st=='ball'){let m0=12;for(const r of p.rec){const d=Math.hypot(r.x-p.b.tx,r.y-p.b.ty);if(d<m0){m0=d;ch=r}}}
+const sp=r=>6.4*(.8+A(p.o,r.i,1)/250)*dt*FZ(p.o,r.i),rt=ROUTES[g.set];let ch=null;if(p.st=='ball'){let m0=12;for(const r of p.rec){const d=Math.hypot(r.x-p.b.tx,r.y-p.b.ty);if(d<m0){m0=d;ch=r}}}
 p.rec.forEach((r,j)=>{if(r===ch){mv(r,p.b.tx,p.b.ty,sp(r)*1.2);return}if(r.k<rt[j].length){const[dx,dy]=rt[j][r.k];if(mv(r,r.sx+dx,r.sy+dy,sp(r)))r.k++}else if(j<3&&rt[j][rt[j].length-1][0]>=18)r.x=Math.min(109,r.x+sp(r)*.95)});
-if(p.st=='live'){p.qb.x=Math.max(p.los-7,p.qb.x-4*dt);const dl=cl(2.6-hd.rd+(eo(p.d,6)-eo(p.o,5))/-25+0,1,4.5);
+if(p.st=='live'){p.qb.x=Math.max(p.los-7,p.qb.x-4*dt);const dl=cl(2.6-hd.rd+(A(p.d,6,2)-A(p.o,5,0))/-25+(A(p.o,5,2)-70)/60,1,4.5);
 for(const e of p.rush){if(p.t>dl)mv(e,p.qb.x,p.qb.y,5.5*dt*hd.sp);if(Math.hypot(e.x-p.qb.x,e.y-p.qb.y)<.9){return endPlay(-RI(4,9),{msg:'SACKED!'})}}}
 else for(const e of p.rush)mv(e,p.qb.x,p.qb.y,2*dt);
 p.cov.forEach(c=>{const r=p.wr[c.t];if(p.st=='ball'&&Math.hypot(c.x-p.b.tx,c.y-p.b.ty)<9)mv(c,p.b.tx,p.b.ty,dsp*1.15);else mv(c,r.x+1.3,r.y,dsp)});
 const far=p.wr.reduce((a,b)=>b.x>a.x?b:a);if(p.st=='ball'&&Math.hypot(p.saf.x-p.b.tx,p.saf.y-p.b.ty)<12)mv(p.saf,p.b.tx,p.b.ty,dsp*1.15);else mv(p.saf,far.x+4,far.y,dsp*.9);
 if(p.st=='ball'){const b=p.b;b.t+=dt;if(b.t>=b.T)resolve()}}
-function throwTo(tx,ty){if(!p||p.st!='live')return;if(tx<p.qb.x-.5){p.scr=true;p.kind='run';p.car=p.qb;p.hd=0;p.st='run';toast('QB KEEPS IT!');bar();return}const _s=S();if(_s)_s.att++;const d=Math.hypot(tx-p.qb.x,ty-p.qb.y),q0=eo(p.o,0),pr=p.rush.some(e=>Math.hypot(e.x-p.qb.x,e.y-p.qb.y)<3.5)?1:0,sc=(100-q0)/100*.08*d+pr*1.3+(g.wea=='RAIN'?.6:0)+Math.abs(g.wind)*.05;tx+=(Math.random()+Math.random()-1)*sc*2;ty+=(Math.random()+Math.random()-1)*sc*1.4;p.b={x0:p.qb.x,y0:p.qb.y,tx,ty,t:0,T:Math.max(.35,d/24)};p.st='ball';bar()}
+function throwTo(tx,ty){if(!p||p.st!='live')return;if(tx<p.qb.x-.5){p.scr=true;p.kind='run';p.car=p.qb;p.hd=0;p.st='run';toast('QB KEEPS IT!');bar();return}const _s=S();if(_s)_s.att++;const arm=A(p.o,0,1),mR=18+arm*.45;let d=Math.hypot(tx-p.qb.x,ty-p.qb.y);if(d>mR){const f=mR/d;tx=p.qb.x+(tx-p.qb.x)*f;ty=p.qb.y+(ty-p.qb.y)*f;d=mR;toast('WEAK ARM: THROW FALLS SHORT!')}const q0=A(p.o,0,0),pr=p.rush.some(e=>Math.hypot(e.x-p.qb.x,e.y-p.qb.y)<3.5)?1:0,sc=(100-q0)/100*.08*d+pr*1.3+(g.wea=='RAIN'?.6:0)+Math.abs(g.wind)*.05+Math.max(0,d-mR*.7)*.05;tx+=(Math.random()+Math.random()-1)*sc*2;ty+=(Math.random()+Math.random()-1)*sc*1.4;p.b={x0:p.qb.x,y0:p.qb.y,tx,ty,t:0,T:Math.max(.35,d/(12+arm*.14))};p.st='ball';bar()}
 function resolve(){const b=p.b;if(b.ty<.5||b.ty>52.5||b.tx>=110)return endPlay(0,{inc:1,msg:'THROWN OUT OF BOUNDS'});let rec=null,m=2.4;for(const r of p.rec){const d=Math.hypot(r.x-b.tx,r.y-b.ty);if(d<m){m=d;rec=r}}
 let dm=99;for(const e of p.cov.concat([p.saf]))dm=Math.min(dm,Math.hypot(e.x-b.tx,e.y-b.ty));const ik=g.poss==0&&!g.p2?DF().ik:1,po=()=>endPlay(Math.round(b.tx-p.los),{to:1,msg:'INTERCEPTED! PICKED OFF!'});
-if(!rec){if(dm<4&&Math.random()<(.3+eo(p.d,6)/400)*ik)return po();return endPlay(0,{inc:1,msg:'INCOMPLETE'})}
-const q=eo(p.o,0),re=eo(p.o,rec.i),wx=g.wea=='RAIN'?.05:g.wea=='SNOW'?.07:0;
-if(dm<1.6&&Math.random()<(.1+eo(p.d,6)/450+(dm<.9?.12:0)-q/700)*ik){rec.x=b.tx;return po()}
+if(!rec){if(dm<4&&Math.random()<(.3+A(p.d,6,1)/400)*ik)return po();return endPlay(0,{inc:1,msg:'INCOMPLETE'})}
+const q=A(p.o,0,0),re=rec.i==4?eo(p.o,4):A(p.o,rec.i,0),wx=g.wea=='RAIN'?.05:g.wea=='SNOW'?.07:0;
+if(dm<1.6&&Math.random()<(.1+A(p.d,6,1)/450+(dm<.9?.12:0)-q/700)*ik){rec.x=b.tx;return po()}
 let pr=.42+re/220+q/330-(dm<1.5?.28:dm<3?.1:0)-wx-Math.abs(g.wind)*.004;
 if(m<1.2&&dm>=1.5)pr=Math.max(pr,.93);if(Math.random()<pr){rec.x=b.tx;rec.y=b.ty;p.car=rec;p.st='run';p.hd=0;bar();if(rec.x>=100)return endPlay(100-p.los,{td:1});toast('COMPLETE!')}
 else endPlay(0,{inc:1,msg:'INCOMPLETE'})}
