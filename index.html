@@ -37,7 +37,7 @@ table{border-collapse:collapse;font-size:10px}td,th{padding:6px 8px;border-botto
 .co{display:inline-block;width:14px;height:14px;border-radius:50%;background:#fd0;border:2px solid #000;margin-left:4px;vertical-align:middle}
 .bar{height:18px;background:#000;border:3px solid #fff}.bar i{display:block;height:100%;background:#d3d10a}
 .seg{display:flex;gap:4px;background:#000;padding:6px}.seg b{flex:1;height:20px;background:#222}.seg b.f{background:#d3d10a}
-.det{text-align:left;line-height:2;font-size:11px;margin-top:6px}.x{position:fixed;top:10px;right:10px;z-index:20;font-size:16px;padding:8px 12px}.top{padding-right:46px;box-sizing:border-box}.mt{position:relative;width:260px;height:20px;background:linear-gradient(90deg,#c22 30%,#fd0 30% 42%,#2c2 42% 58%,#fd0 58% 70%,#c22 70%);border:3px solid #fff}.mt i{position:absolute;top:-4px;width:6px;height:24px;background:#fff;left:50%}#al{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:50;background:#000;border:3px solid #fff;padding:12px;display:none;font-size:11px;max-width:90vw;text-align:center}#ask{position:fixed;inset:0;z-index:60;background:#000a;display:none;align-items:center;justify-content:center}.bar.best{border-color:#fd0}.bar u{position:absolute;top:0;bottom:0;width:3px;background:#fff9}.rt{font-size:.6em;color:#fd0;margin-left:10px;white-space:nowrap}</style></head><body>
+.det{text-align:left;line-height:2;font-size:11px;margin-top:6px}.x{position:fixed;top:10px;right:10px;z-index:20;font-size:16px;padding:8px 12px}.top{padding-right:46px;box-sizing:border-box}.mt{position:relative;width:260px;height:20px;background:linear-gradient(90deg,#c22 30%,#fd0 30% 42%,#2c2 42% 58%,#fd0 58% 70%,#c22 70%);border:3px solid #fff}.mt i{position:absolute;top:-4px;width:6px;height:24px;background:#fff;left:50%}#al{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:50;background:#000;border:3px solid #fff;padding:12px;display:none;font-size:11px;max-width:90vw;text-align:center}#ask{position:fixed;inset:0;z-index:60;background:#000a;display:none;align-items:center;justify-content:center}.bar.best{border-color:#fd0}.bar u{position:absolute;top:0;bottom:0;width:3px;background:#fff9}.rt{font-size:.6em;color:#fd0;margin-left:10px;white-space:nowrap}.simb{position:fixed;left:12px;bottom:12px;display:flex;flex-direction:row;gap:8px;z-index:11}.simb button{font-size:9px;padding:8px 10px}</style></head><body>
 <div id="wrap"><div id="hud"></div><div id="cvw"><canvas id="c" width="900" height="420"></canvas><div id="toast"></div></div><div id="info"></div><div id="bar"></div></div>
 <div id="ui"></div><div id="al"></div><div id="ask"></div><div class="line" id="ln" style="display:none"></div>
 <script>
@@ -90,7 +90,7 @@ const nd=G.po?poBand():[G.wk-1,G.wk,G.wk+1].map(w=>{if(w<1||w>8)return'<div clas
 const dv=TEAMS.filter((_,i)=>(i>>2)==(G.tm>>2)).map(t=>({t,w:t.a==me.a?G.w:G.st[t.a][0],l:t.a==me.a?G.l:G.st[t.a][1]})).sort((a,b)=>b.w-a.w);
 const fp=Math.round(cl(G.fans/2,0,100)),tips=['STRONG PLAYERS WIN GAMES!','TRADE DRAFT PICKS FOR STARS','KEEP MORALE HIGH TO AVOID FUMBLES','WIND AFFECTS FIELD GOALS'];
 ui(hdr('RETRO GRIDIRON','Y'+G.yr)+`<div class=band>${nd}</div><div class=row>`+bx('CONF '+DIVS[G.tm>>2],`<table style="width:100%"><tr><td><td>W<td>L<td>T</tr>${dv.map(d=>`<tr class="${d.t.a==me.a?'me':''}"><td>${d.t.n}<td>${d.w}<td>${d.l}<td>0</tr>`).join('')}</table>`,'half')+`<div class="half col">`+bx('FANS '+fp+'%',`<div class=bar><i style="width:${fp}%"></i></div>`)+`<div class=row>`+bx('MORALE',`${G.morale}% ${smile(G.morale)}`)+bx('OFFENSE',stars(mean([0,1,2,3,4,5]),'#5bc0f8'))+bx('DEFENSE',stars(mean([5,6,7]),'#f33'))+`</div></div></div><div class=r>TIP! ${pk(tips)}</div>
-<div class=nav><button onclick=settings()>⚙ NEW TEAM</button><button onclick=fo()>FRONT OFFICE</button><button onclick=roster()>ROSTER</button><button onclick=dif()>LEVEL: ${DF().n}</button><button onclick=sstat()>STATS</button><button onclick="start(1)">2 PLAYER</button><button onclick="start(0)">CONTINUE ▶</button></div>`)}
+<div class=nav><button onclick=settings()>⚙ NEW TEAM</button><button onclick=fo()>FRONT OFFICE</button><button onclick=roster()>ROSTER</button><button onclick=dif()>LEVEL: ${DF().n}</button><button onclick=sstat()>STATS</button><button onclick="start(1)">2 PLAYER</button><button onclick="start(0)">CONTINUE ▶</button></div><div class=simb><button onclick="simAsk('po')">SIM TO PLAYOFFS</button><button onclick="simAsk('dr')">SIM TO DRAFT</button></div>`)}
 let askF=null;
 window.alert=m=>{const d=$('al');d.textContent=m;d.style.display='block';clearTimeout(d.t);d.t=setTimeout(()=>d.style.display='none',2500)};
 function ask(m,yes){askF=yes;$('ask').innerHTML=`<div class=bx style="background:#111;padding:20px;max-width:320px;text-align:center"><div class=r>${m}</div><div class=nav style="margin-top:14px"><button onclick="askY()">YES</button><button onclick="$('ask').style.display='none'">NO</button></div></div>`;$('ask').style.display='flex'}
@@ -154,7 +154,10 @@ function fo(){const rows=[['stadium','STADIUM'],['training','TRAINING FACILITIES
 ui(hdr('FRONT OFFICE','','menu()')+capb()+rows+`<div class=r>Stadium = more income &middot; Training/Staff = growth &middot; Rehab = fewer injuries</div><div class=nav><button onclick=menu()>⌂</button><button onclick="up('cap')">INCREASE SALARY CAP +10M ${co(100)}</button><button onclick="mk('fa')">FREE AGENTS</button><button onclick="mk('dr')">DRAFT</button><button onclick="mk('tr')">TRADE</button>${bx('DRAFT PICKS',G.picks)}</div>`)}
 function mk(k){const T={fa:'FREE AGENTS',dr:'DRAFT',tr:'TRADE'};let g2=G[k];
 if(k=='dr'&&!G.draft)return ui(hdr(T[k],'','fo()')+`<div class=r>The draft opens after the season ends.</div><div class=nav><button onclick=fo()>←</button></div>`);
-ui(hdr(T[k],'','fo()')+`<div class=grid>${g2.map((a,i)=>card(a,{s:1,f:`buy('${k}',${i})`,c:k=='fa'?co(a.cost):k=='dr'?'FREE':'1 PICK'})).join('')}</div><div class=nav><button onclick=fo()>←</button>${capb()}<button onclick=roster()>ROSTER</button>${k=='fa'?`<button onclick=refr()>REFRESH ${co(5)}</button>`:''}</div>`)}
+ui(hdr(T[k],'','fo()')+`<div class=grid>${g2.map((a,i)=>card(a,{s:1,f:`pv('${k}',${i})`,c:k=='fa'?co(a.cost):k=='dr'?'FREE':'1 PICK'})).join('')}</div><div class=nav><button onclick=fo()>←</button>${capb()}<button onclick=roster()>ROSTER</button>${k=='fa'?`<button onclick=refr()>REFRESH ${co(5)}</button>`:''}</div>`)}
+function pv(k,i){const L=G[k],a=ens(L[i]),old=ens(G.team[a.i]),P=POS[a.slot],h=hs(a.name,1),age=a.age||21+h%12,pot=Math.min(99,a.ovr+Math.floor(a.mx.reduce((t,m,q)=>t+Math.max(0,m-a.at[q]),0)/5)),n=L.length,cost=k=='fa'?co(a.cost)+' credits':k=='dr'?'FREE (DRAFT PICK)':'1 DRAFT PICK',after=used()-old.sal+a.sal,d=a.ovr-old.ovr;
+const at=[0,1,2,3].map(q=>[q==3?'STAMINA':P[q+1],a.at[q],a.mx[q],old.at[q]]);
+ui(`<button class=x onclick="mk('${k}')">✕</button><div class=ttl>${a.slot} - ${a.name.toUpperCase()} <span class=rt>RATING ${a.ovr} / MAX ${pot}</span></div><div class=row>`+bx(P[0],`<div class=det>AGE: ${age}${age<=22?' ROOKIE':''}<br>CONTRACT: $${a.sal}M (${1+h%3}Y)<br>PRICE: ${cost}<br>CAP AFTER: ${after}M / ${G.cap}M${after>G.cap?' <b style="color:#f66">OVER CAP!</b>':''}<br>REPLACES: ${old.name} (${old.ovr}, $${old.sal}M)<br>CHANGE: <b style="color:${d>=0?'#6f6':'#f66'}">${d>=0?'+':''}${d} RATING</b></div><div class=row style="margin-top:14px"><div>RATING<br>${stars(a.ovr)}</div><div>POTENTIAL<br>${stars(pot)}</div></div>`+bx('XP LEVEL '+a.lv,`<div class=bar><i style="width:${Math.min(100,a.xp/(60+a.lv*30)*100)}%"></i></div>`),'half')+bx('ATTRIBUTES',at.map(([nm,v,m,o])=>`<div class=det>${nm}${m>=100?' ★ CAN MAX OUT TO BEST':' (MAX '+m+')'} <span style="color:${v>=o?'#6f6':'#f66'}">[NOW ${v} vs YOURS ${o}]</span></div><div class="bar ${m>=100?'best':''}" style="position:relative"><i style="width:${v}%"></i><u style="left:${Math.min(99,m)}%"></u></div>`).join(''),'half')+`</div><div class=nav><button onclick="pv('${k}',${(i+n-1)%n})">◀</button><button onclick="mk('${k}')">←</button><button onclick="buy('${k}',${i})">${k=='fa'?'SIGN':k=='dr'?'DRAFT':'TRADE FOR'} ✔</button><button onclick="pv('${k}',${(i+1)%n})">▶</button></div>`)}
 function refr(){if(G.cr<5)return alert('Not enough credits');G.cr-=5;genFA();save();mk('fa')}
 function buy(k,i){const a=G[k][i],ix=a.i,old=G.team[ix],cost=a.cost||0;
 if(k=='dr'&&!G.draft)return;if(k=='tr'&&G.picks<1)return alert('No picks left');if(G.cr<cost)return alert('Not enough credits');
@@ -205,10 +208,12 @@ const y=cl(sp,1,99);change(i,y);if(y>=40)cheer();toast(k+' RETURN: BALL AT YOUR 
 function tmo(){if(kk||p.st!='pre'||g.to[g.poss]<1)return;g.to[g.poss]--;g.tos=true;toast('TIMEOUT '+g.names[g.poss]);bar()}
 function kr(i){G.kr=i;save();alert(G.team[i].name+' is now your kick returner.');pl(i)}
 function change(np,b){g.poss=np;g.ball=b;g.down=1;g.togo=10;g.set=0}
-function tick(s){g.clock-=s;if(g.clock<=0){if(g.q>=4){g.over=true;g.clock=0}else{g.q++;g.clock=120;if(g.q==3){g.to=[3,3];g.snaps=0}}}}
+function tick(s){g.clock-=s;if(g.clock<=0){if(g.q>=4){g.over=true;g.clock=0}else{g.q++;g.clock=Math.min(120,120+g.clock);if(g.q==3){g.to=[3,3];g.snaps=0}}}}
 function next(){p.st='done';bar();setTimeout(()=>{if(g.over)return endGame();if(g.pendRet)return startRet();let n=0;while(g.poss==1&&!g.p2&&!g.over&&!g.pendRet&&n++<5)simDrive();if(g.over)return endGame();if(g.pendRet)return startRet();setup()},900)}
-function simDrive(){const o=g.teams[1],d=g.teams[0],os=av([0,1,2,3,4,5].map(i=>eo(o,i))),ds=(A(d,6,0)+A(d,6,1)+A(d,5,0))/3,pr=cl(.27+(os-ds)/110,.08,.6),r=Math.random();let m,b=RI(26,40);tick(RI(25,60));
-if(r<pr){g.score[1]+=7;m=g.names[1]+' scored a TD!';b=25}else if(r<pr+.15){g.score[1]+=3;m=g.names[1]+' kicked a FG';b=25}else m=g.names[1]+' drive stalled';
+function simDrive(){const o=g.teams[1],d=g.teams[0],os=av([0,1,2,3,4,5].map(i=>eo(o,i))),ds=(A(d,6,0)+A(d,6,1)+A(d,5,0))/3,pr=cl(.27+(os-ds)/110,.08,.6),r=Math.random();let m,b=RI(26,40);
+const kind=r<pr?'td':r<pr+.15?'fg':'stall',need=kind=='td'?RI(35,75):kind=='fg'?RI(30,65):RI(12,40),cut=(g.q==2||g.q==4)&&need>g.clock,f=n=>Math.floor(n/60)+':'+String(n%60).padStart(2,'0');
+if(cut){const left=Math.ceil(g.clock);tick(left);m=g.names[1]+' ran out of time!';b=25}
+else{tick(need);if(kind=='td'){g.score[1]+=7;m=g.names[1]+' scored a TD!';b=25}else if(kind=='fg'){g.score[1]+=3;m=g.names[1]+' kicked a FG';b=25}else m=g.names[1]+' drive stalled';m+=' ('+f(need)+' off the clock)'}
 toast(m);if(b==25)ko(0);else g.pendRet={kind:'punt',i:0}}
 function endPlay(gain,o={}){if(p.st=='done')return;if(g.conv){g.conv=false;p.st='done';const pc=g.poss,ok=!o.to&&(o.td||g.ball+gain>=100);if(ok){g.score[pc]+=2;toast('TWO-POINT CONVERSION IS GOOD!');cheer()}else toast('TWO-POINT TRY STOPPED!');ko(1-pc);return next()}if(p.ret)return retEnd(gain,o);stat(gain,o);const pos=g.poss;tick(g.tos?3:o.inc?4:o.oob?RI(3,7):RI(6,13)+5);g.tos=false;let m=o.msg||'';
 if(!o.to&&(o.td||g.ball+gain>=100)){g.score[pos]+=6;toast('TOUCHDOWN '+g.names[pos]+'!');cheer();return xp(pos)}
@@ -216,14 +221,23 @@ if(o.to){toast(m||'TURNOVER!');change(1-pos,cl(Math.round(100-(g.ball+gain)),1,9
 g.ball=Math.max(1,g.ball+gain);g.togo-=gain;if(gain>=20&&!o.inc)cheer();
 if(g.togo<=0){g.down=1;g.togo=Math.min(10,100-g.ball);m+=' 1st down!'}else{g.down++;if(g.down>4){toast('TURNOVER ON DOWNS');change(1-pos,100-g.ball);return next()}}
 toast(m+(o.inc?'':` (${gain>0?'+':''}${gain} yds)`));next()}
-function endGame(){p.st='done';const [a,b]=g.score;let h=`<h1>FINAL</h1><div class=r style="font-size:16px">${g.names[0]} ${a} - ${g.names[1]} ${b}</div>`;
-if(g.p2)h+=`<div class=r>${a==b?'TIE':a>b?'PLAYER 1 WINS':'PLAYER 2 WINS'}</div>`;
-else if(G.po){h+=poResult(a,b)}else{const win=a>b;G.stats=G.stats||newStats();G.stats.gp++;G.stats.pf+=a;G.stats.pa+=b;G.last=win?'W':'L';G.hist[G.wk]=(win?'W ':'L ')+a+'-'+b;simLeague();win?G.w++:G.l++;G.fans=Math.max(10,G.fans+(win?15+RI(0,10):-10));G.morale=cl(G.morale+(win?8:-10),10,100);
+function regResult(a,b){let h='';const win=a>b;G.stats=G.stats||newStats();G.stats.gp++;G.stats.pf+=a;G.stats.pa+=b;G.last=win?'W':'L';G.hist[G.wk]=(win?'W ':'L ')+a+'-'+b;simLeague();win?G.w++:G.l++;G.fans=Math.max(10,G.fans+(win?15+RI(0,10):-10));G.morale=cl(G.morale+(win?8:-10),10,100);
 const inc=Math.round((G.fans/8*(1+.1*G.fac.stadium)+(win?30:5))*DF().cr);G.cr+=inc;
 G.team.forEach(t=>{t.inj=0;if(Math.random()<.2+.07*(G.fac.training+G.fac.staff)){t.ovr=Math.min(99,t.ovr+1);t.sal=Math.max(1,Math.round((t.ovr-45)/4))}});
 let inj='';if(Math.random()<.3-.05*G.fac.rehab){const t=pk(G.team);t.inj=1;inj=`<br>${t.slot} ${t.name} is injured!`}
 h+=`<div class=r>${win?'VICTORY! Fans up.':'DEFEAT. Fans down.'}<br>+${inc} credits &middot; Fans ${G.fans} &middot; Morale ${G.morale}${inj}</div>`;
-h+=gainXP(win)+lvlMsg(win);G.wk++;if(G.wk>8)h+=startPO();newOpp();genFA();genTr();save()}
+h+=gainXP(win)+lvlMsg(win);return h}
+function simOne(){const us=av([0,1,2,3,4,5,6,7].map(i=>eo(G.team,i))),op=G.opp.s+DF().b,win=Math.random()<cl(.5+(us-op)/45,.08,.92),w=RI(20,38),l=RI(3,Math.min(w-1,24));return win?[w,l]:[l,w]}
+function simAsk(k){if(k=='po'&&G.po)return alert('You are already in the playoffs!');ask(k=='po'?'Sim the rest of the regular season and go to the playoffs? Your games are decided automatically.':'Sim the rest of the season, including the playoffs, and go to the draft? Your games are decided automatically.',()=>simTo(k))}
+function simTo(k){const log=[];let rec='';
+if(!G.po){while(G.wk<=8){const [a,b]=simOne(),opp=G.opp.n;regResult(a,b);log.push(`WEEK ${G.wk} vs ${opp}: ${a>b?'W':'L'} ${a}-${b}`);G.wk++;if(G.wk<=8)newOpp()}
+rec=G.w+'-'+G.l;log.push('FINAL RECORD: '+rec);log.push(startPO().replace(/<[^>]+>/g,' ').trim())}
+if(k=='dr'){let n=0;while(G.po&&n++<6){const rn=RN[G.po.r],[a,b]=simOne();log.push(`${rn} vs ${TM(G.opp.n).n}: ${a>b?'W':'L'} ${a}-${b}`);log.push(poResult(a,b).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim())}}
+genFA();genTr();save();
+ui(hdr(k=='dr'?'SIM TO DRAFT':'SIM TO PLAYOFFS','Y'+G.yr)+`<div class=r style="max-width:620px;text-align:left;line-height:2">${log.join('<br>')}</div><div class=nav>${k=='dr'?'<button onclick="mk(\'dr\')">GO TO DRAFT</button>':''}<button onclick=menu()>CONTINUE</button></div>`)}
+function endGame(){p.st='done';const [a,b]=g.score;let h=`<h1>FINAL</h1><div class=r style="font-size:16px">${g.names[0]} ${a} - ${g.names[1]} ${b}</div>`;
+if(g.p2)h+=`<div class=r>${a==b?'TIE':a>b?'PLAYER 1 WINS':'PLAYER 2 WINS'}</div>`;
+else if(G.po){h+=poResult(a,b)}else{h+=regResult(a,b);G.wk++;if(G.wk>8)h+=startPO();newOpp();genFA();genTr();save()}
 ui(h+'<button onclick="menu()">CONTINUE</button>');p=null;g=null}
 /* update */
 const mv=(o,tx,ty,s)=>{const dx=tx-o.x,dy=ty-o.y,d=Math.hypot(dx,dy);if(d<=s){o.x=tx;o.y=ty;return true}o.x+=dx/d*s;o.y+=dy/d*s;return false};
@@ -235,7 +249,7 @@ if(c.x>=100)return endPlay(100-p.los,{td:1});if(c.y<1||c.y>52)return endPlay(Mat
 const rate=cl(4.5-oc/30+(Dt-ol)/40,1.2,5)*(g.poss==0&&!g.p2?(p.kind=='run'?1+(DF().tk-1)*.3:DF().tk):1)*(p.ret?(p.rk=='punt'?1.4:.7):p.scr?(c.x<p.los-.5?.2:1):p.kind=='run'?(c.x<p.los-.5?.15:c.x<p.los+5?.35:.3):1);
 if(c.inv>0)c.inv-=dt;
 const R2=p.kind=='run'?1.9:1.4,nc=defs().filter(e=>!e.blk&&Math.hypot(e.x-c.x,e.y-c.y)<R2).length;
-if(!(c.inv>0)&&nc&&Math.random()<dt*rate*(p.kind=='run'?1+.25*(nc-1):nc)*(c.dvt>0?.4:1)*(c.hz>0?.5:1)){if(p.kind=='run'&&Math.random()>cl(.72+(Dt-bk)/150,.4,.95)){c.inv=.45}else{if(g.poss==0&&G.morale<40&&Math.random()<.1)return endPlay(Math.round(c.x-p.los),{to:1,msg:'FUMBLE!'});tkAnim(c);return endPlay(Math.round(c.x-p.los))}}}
+if(!(c.inv>0)&&nc&&Math.random()<dt*rate*(p.kind=='run'?1+.25*(nc-1):nc)*(c.dvt>0?.4:1)*(c.hz>0?.5:1)){if(Math.random()>1-(1-cl(.75+(Dt-bk)/110,.2,.95))*(p.kind=='run'?1:.6)){c.inv=.45;toast('BROKE A TACKLE!')}else{if(g.poss==0&&G.morale<40&&Math.random()<.1)return endPlay(Math.round(c.x-p.los),{to:1,msg:'FUMBLE!'});tkAnim(c);return endPlay(Math.round(c.x-p.los))}}}
 else if(c=p.car){c.x=Math.max(c.x-3*dt,p.los-8)}
 if(p.t>p.hd||p.car.i!=4)for(const e of defs()){if(e.cm&&e.cm.t>0){e.cm.t-=dt;mv(e,e.cm.x,e.cm.y,dsp*1.1);continue}const db=e===p.saf||p.cov.includes(e);mv(e,p.car.x+Math.min(3,Math.hypot(e.x-p.car.x,e.y-p.car.y)*.25),p.car.y,dsp*(e.blk?.12:1)*(p.kind=='pass'?(db?1.22*dbm:1.08):p.kind=='run'?1.2:(p.car.i==4?1:1.05)))}
 else for(const e of p.rush)mv(e,p.car.x,p.car.y,dsp*.9);return}
