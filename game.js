@@ -43,7 +43,7 @@ const capb=()=>bx(`SALARY CAP ${used()}M / ${G.cap}M`,`<div class=bar><i style="
 const card=(a,o={})=>{const u=a.slot=='DEF'||a.slot=='OL'?'#f33':a.slot=='K'?'#e8660e':'#5bc0f8';return `<div class=w><div class="cd ${o.f?'clk':''}" ${o.f?`onclick="${o.f}"`:''}><div class=ph style="background:${a.inj?'#888':u}"><b>${a.slot}</b>${smile(G.morale)}${face(a,ME().c)}</div><div class=nm>${a.name.split('.')[1]}${stars(a.ovr)}${a.pts>0?'<div>⬆ UPGRADE</div>':''}${o.s?`<div>$${a.sal}M</div>`:''}</div><div class=en><i style="width:${a.inj?0:cl(a.ovr,10,100)}%"></i></div></div>${o.c?`<div class=pill>${o.c}</div>`:''}</div>`};
 function pick0(){ui(`<div class=ttl>SELECT YOUR TEAM</div><div class=r>Stronger teams have better players. Pick wisely!</div><div class=grid>`+TEAMS.map((t,i)=>`<div class=w><div class="cd clk" onclick="pickTeam(${i})"><div class=ph style="background:${t.h}">${face({sk:i%4,hr:i%4},t.c)}</div><div class=nm>${t.n}${stars(t.s+10)}<div>${t.a} &middot; ${DIVS[i>>2]}</div></div></div></div>`).join('')+'</div>')}
 function pickTeam(i){const s=TEAMS[i].s;fresh();G.tm=i;G.team=SL.map(k=>mkP(k,cl(RI(s-8,s+4),50,92)));genFA();genDr();genTr();newSeason();newOpp();save();tutDone?menu():startTut()}
-function menu(){if(!(G.tm>=0))return pick0();const me=ME();
+function menu(){if(!(G.tm>=0))return pick0();const me=ME();if(!G.secretU&&offR()>=90&&defR()>=90){G.secretU=true;save();setTimeout(()=>alert('🔓 SECRET DIFFICULTY UNLOCKED! Check the LEVEL button.'),500)}
 const nd=G.po?poBand():[G.wk-1,G.wk,G.wk+1].map(w=>{if(w<1||w>8)return'<div class=nd></div>';const o=G.sch[w-1];return `<div class=nd><div>WEEK ${w}</div><div>${o.h?'vs':'at'} ${TM(o.n).n}</div><i class="dot ${w<G.wk?'g':''}"></i><div>${G.hist[w]||'&nbsp;'}</div></div>`}).join('');
 const dv=TEAMS.filter((_,i)=>(i>>2)==(G.tm>>2)).map(t=>({t,w:t.a==me.a?G.w:G.st[t.a][0],l:t.a==me.a?G.l:G.st[t.a][1]})).sort((a,b)=>b.w-a.w);
 const fp=Math.round(cl(G.fans/2,0,100)),tips=['STRONG PLAYERS WIN GAMES!','TRADE DRAFT PICKS FOR STARS','KEEP MORALE HIGH TO AVOID FUMBLES','WIND AFFECTS FIELD GOALS'];
@@ -69,9 +69,11 @@ ui(`<button class=x onclick=roster()>✕</button><div class=ttl>${a.slot} - ${a.
 function meet(i){const k=G.wk+'-'+G.yr;if(G.mtg==k)return alert('You already held a meeting this week.');G.mtg=k;G.morale=Math.min(100,G.morale+3);save();pl(i)}
 function trd(i){const a=G.team[i];ask('Trade '+a.name+' for a draft pick? A weaker backup takes his spot.',()=>{G.picks++;G.team[i]=mkP(a.slot,Math.max(50,a.ovr-15));save();roster()})}
 const DFB=[{n:'ROOKIE',b:-6,sp:.93,rd:-.5,ik:.7,cr:1,tk:.7},{n:'PRO',b:0,sp:1,rd:0,ik:1,cr:1,tk:1},{n:'ALL-PRO',b:6,sp:1.06,rd:.5,ik:1.3,cr:1.25,tk:1.3},{n:'LEGEND',b:12,sp:1.12,rd:2,ik:1.6,cr:1.5,tk:1.7,db:1.45}];
-const DF=()=>{if(g&&g.tut)return{n:'TUTORIAL',b:-20,sp:.55,rd:-2,ik:0,cr:0,tk:.2};const d=G.diff??1;if(d<4)return DFB[d];const L=cl(G.dl||5,1,10),t=(L-1)/9,a=DFB[0],z=DFB[3],lp=k=>a[k]+(z[k]-a[k])*t;return{n:'DYNAMIC '+L+'/10',b:lp('b'),sp:lp('sp'),rd:lp('rd'),ik:lp('ik'),cr:lp('cr'),tk:lp('tk'),db:1+.45*t}};
+const DFX={5:{n:'NIGHTMARE',b:20,sp:1.2,rd:2.5,ik:2.2,cr:2,tk:2.4,db:1.7,sr:1.1},6:{n:'IMPOSSIBLE',b:30,sp:1.3,rd:3,ik:3,cr:3,tk:3.2,db:2,sr:1.4},7:{n:'GRIDIRON GOD',b:40,sp:1.4,rd:3.5,ik:4,cr:5,tk:4.5,db:2.4,sr:1.8}};
+const offR=()=>mean([0,1,2,3,4,5]),defR=()=>mean([5,6,7]),ORD=()=>[0,1,2,3,5,6,...(G.secretU?[7]:[]),4];
+const DF=()=>{if(g&&g.tut)return{n:'TUTORIAL',b:-20,sp:.55,rd:-2,ik:0,cr:0,tk:.2};const d=G.diff??1;if(d>=5)return DFX[d]||DFB[3];if(d<4)return DFB[d];const L=cl(G.dl||5,1,10),t=(L-1)/9,a=DFB[0],z=DFB[3],lp=k=>a[k]+(z[k]-a[k])*t;return{n:'DYNAMIC '+L+'/10',b:lp('b'),sp:lp('sp'),rd:lp('rd'),ik:lp('ik'),cr:lp('cr'),tk:lp('tk'),db:1+.45*t}};
 function lvlMsg(win){if((G.diff??1)!=4)return'';const o=cl(G.dl||5,1,10),n=cl(o+(win?1:-1),1,10);G.dl=n;return `<div class=r>DYNAMIC DIFFICULTY: ${win?'WIN':'LOSS'} &rarr; LEVEL ${o} to ${n}${n==o?' (limit reached)':''}</div>`}
-function dif(){G.diff=((G.diff??1)+1)%5;if(G.diff==4&&!G.dl)G.dl=5;save();menu()}
+function dif(){const o=ORD(),i=o.indexOf(G.diff??1);G.diff=o[(i+1)%o.length];if(G.diff==4&&!G.dl)G.dl=5;save();menu()}
 /* stats + playoffs */
 const newStats=()=>({cmp:0,att:0,pyd:0,ptd:0,int:0,ryd:0,rtd:0,sk:0,fgm:0,fga:0,pf:0,pa:0,gp:0,rec:{}});
 const S=()=>{if(g&&g.poss==0&&!g.p2&&!g.tut){G.stats=G.stats||newStats();return G.stats}return null};
@@ -229,8 +231,8 @@ else for(const e of p.rush)mv(e,p.car.x,p.car.y,dsp*.9);return}
 /* passing */
 const sp=r=>6.4*(.8+A(p.o,r.i,1)/250)*dt*FZ(p.o,r.i),rt=ROUTES[g.set];let ch=null;if(p.st=='ball'){let m0=12;for(const r of p.rec){const d=Math.hypot(r.x-p.b.tx,r.y-p.b.ty);if(d<m0){m0=d;ch=r}}}
 p.rec.forEach((r,j)=>{if(r===ch){mv(r,p.b.tx,p.b.ty,sp(r)*1.2);return}if(r.k<rt[j].length){const[dx,dy]=rt[j][r.k];if(mv(r,r.sx+dx,r.sy+dy,sp(r)))r.k++}else if(j<3&&rt[j][rt[j].length-1][0]>=18)r.x=Math.min(109,r.x+sp(r)*.95)});
-if(p.st=='live'){p.qb.x=Math.max(p.los-7,p.qb.x-4*dt);const dl=cl(2.6-hd.rd+(A(p.d,6,2)-A(p.o,5,0))/-25+(A(p.o,5,2)-70)/60,hd.rd>1?1-(hd.rd-1)*.6:1,4.5);
-for(const e of p.rush){if(p.t>dl)mv(e,p.qb.x,p.qb.y,5.5*dt*hd.sp);if(Math.hypot(e.x-p.qb.x,e.y-p.qb.y)<.9){return endPlay(-RI(4,9),{msg:'SACKED!'})}}}
+if(p.st=='live'){p.qb.x=Math.max(p.los-7,p.qb.x-4*dt);const dl=cl(2.6-hd.rd+(A(p.d,6,2)-A(p.o,5,0))/-25+(A(p.o,5,2)-70)/60,Math.max(.15,hd.rd>1?1-(hd.rd-1)*.6:1),4.5);
+for(const e of p.rush){if(p.t>dl)mv(e,p.qb.x,p.qb.y,5.5*dt*hd.sp);if(Math.hypot(e.x-p.qb.x,e.y-p.qb.y)<(hd.sr||.9)){return endPlay(-RI(4,9),{msg:'SACKED!'})}}}
 else for(const e of p.rush)mv(e,p.qb.x,p.qb.y,2*dt);
 p.cov.forEach(c=>{const r=p.wr[c.t];if(p.st=='ball'&&Math.hypot(c.x-p.b.tx,c.y-p.b.ty)<9)mv(c,p.b.tx,p.b.ty,dsp*1.15*dbm);else mv(c,r.x+1.3,r.y,dsp*dbm)});
 const far=p.wr.reduce((a,b)=>b.x>a.x?b:a);if(p.st=='ball'&&Math.hypot(p.saf.x-p.b.tx,p.saf.y-p.b.ty)<12)mv(p.saf,p.b.tx,p.b.ty,dsp*1.15*dbm);else mv(p.saf,p.rb.x+1.5,p.rb.y,dsp*1.05*dbm);
@@ -306,7 +308,7 @@ if(ring){x.fillStyle='#7a3a12';if(pose)x.fillRect(-2,-28,5,3);else x.fillRect(3,
 if(star&&!pose){x.fillStyle='#ffd700';x.fillRect(-2,-22,4,4)}
 x.restore()}
 function draw(){x.clearRect(0,0,W,H);x.imageSmoothingEnabled=false;if(!g||!p)return;
-const foc=p.st=='run'||p.st=='ball'?(p.car?p.car.x:p.b?p.b.tx:p.los):p.st=='live'?p.los:p.los+6;cam+=(cl(foc,24,76)-cam)*.12;
+const foc=p.st=='run'||p.st=='ball'?(p.car?p.car.x:p.b?p.b.tx:p.los):p.st=='live'?p.los:p.los+6;cam+=(cl(foc,22,78)-cam)*.12;
 const ck=W+'|'+TOP+'|'+TC[0].j+TC[0].h+TC[1].j+TC[1].h;if(ck!=ckey){crowd=mkCrowd();ckey=ck}x.drawImage(crowd,0,0);
 for(let y=-10;y<110;y+=5){x.fillStyle=y<0?TC[0].h:y>=100?TC[1].h:((y/5)&1?'#3f7a38':'#376f31');x.fillRect(sxp(y),TOP,5*SX+1,53*SY)}
 if(gk!=W+'|'+H){grass=mkGrass();vig=mkVig();gk=W+'|'+H}x.drawImage(grass,0,TOP);x.fillStyle='#fff8';for(let y=0;y<=100;y+=5)x.fillRect(sxp(y)-1,TOP,2,53*SY);
