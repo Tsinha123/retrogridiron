@@ -158,3 +158,12 @@ tr:nth-child(even) td{background:#ffffff0d}
 #tut .tp i.c{background:var(--gold);animation:blink 1s infinite}
 #tut button{font-size:8px;padding:6px 9px;float:right;margin-top:-26px}
 @keyframes blink{50%{opacity:.35}}
+
+/* ---------- pause, backup, touch ---------- */
+#pz{display:none;position:absolute;top:8px;right:8px;z-index:6;padding:6px 9px;font-size:8px}
+textarea{width:min(560px,92%);height:130px;font:inherit;font-size:9px;line-height:1.5;background:#05102e;color:#fff;border:3px solid #fff;border-radius:6px;padding:8px;word-break:break-all}
+@media (pointer:coarse){button{padding:14px 16px;font-size:11px}#bar{gap:10px}#pz{padding:10px 12px;font-size:10px}}
+
+/* ---------- text inputs ---------- */
+input[type=text]{font:inherit;font-size:11px;width:min(260px,80vw);padding:8px;margin:6px 0 10px;background:#05102e;color:#fff;border:3px solid #fff;border-radius:5px;text-transform:uppercase}
+input[type=color]{width:54px;height:34px;border:3px solid #fff;border-radius:5px;background:none;padding:0;vertical-align:middle;margin:4px 8px 8px 4px;cursor:pointer}
