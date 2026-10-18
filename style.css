@@ -167,3 +167,8 @@ textarea{width:min(560px,92%);height:130px;font:inherit;font-size:9px;line-heigh
 /* ---------- text inputs ---------- */
 input[type=text]{font:inherit;font-size:11px;width:min(260px,80vw);padding:8px;margin:6px 0 10px;background:#05102e;color:#fff;border:3px solid #fff;border-radius:5px;text-transform:uppercase}
 input[type=color]{width:54px;height:34px;border:3px solid #fff;border-radius:5px;background:none;padding:0;vertical-align:middle;margin:4px 8px 8px 4px;cursor:pointer}
+
+/* ---------- play-by-play ticker ---------- */
+#cmt{display:none;position:absolute;left:0;right:0;bottom:0;padding:16px 12px 7px;font-size:10px;line-height:1.6;text-align:center;color:#ffe45c;pointer-events:none;
+  background:linear-gradient(transparent,#000c 55%);text-shadow:1px 1px 0 #000}
+#cmt.pop{animation:rise .3s ease both}
