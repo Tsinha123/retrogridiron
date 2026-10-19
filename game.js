@@ -1,4 +1,7 @@
-const $=i=>document.getElementById(i),cv=$('c'),x=cv.getContext('2d');let W=900,H=420,SX=14,SY=7.2,TOP=24;
+const $=i=>document.getElementById(i),cv=$('c'),x=cv.getContext('2d');
+(function(){const w=$('cvw');if(!w)return;const mk=(t,id,css)=>{let e=$(id);if(!e){e=document.createElement(t);e.id=id;w.appendChild(e)}if(css)Object.assign(e.style,css);return e};
+mk('div','tut');mk('div','cmt',{position:'absolute',left:'0',right:'0',bottom:'0',padding:'16px 12px 7px',fontSize:'10px',lineHeight:'1.6',textAlign:'center',color:'#ffe45c',pointerEvents:'none',background:'linear-gradient(transparent,#000c 55%)',textShadow:'1px 1px 0 #000'});
+const z=mk('button','pz',{position:'absolute',top:'8px',right:'8px',zIndex:'6',fontSize:'8px',padding:'6px 9px'});if(!z.textContent.trim())z.innerHTML='&#10074;&#10074; PAUSE';z.onclick=()=>togglePause()})();let W=900,H=420,SX=14,SY=7.2,TOP=24;
 function resize(){const r=$('cvw').getBoundingClientRect(),w=r.width|0,h=r.height|0;if(w<50||h<50||(w==W&&h==H))return;W=cv.width=w;H=cv.height=h;SX=W/64;TOP=Math.max(24,Math.round(H*.12));SY=(H-TOP)/53}
 addEventListener('resize',resize);
 const R=(a,b)=>a+Math.random()*(b-a),RI=(a,b)=>Math.floor(R(a,b+1)),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),pk=a=>a[RI(0,a.length-1)],av=a=>a.reduce((s,v)=>s+v,0)/a.length;
@@ -217,7 +220,7 @@ function replay(aft){p.st='replay';p.ri=0;p.rt=0;p.after=aft;p.hist=p.hist.slice
 function skipReplay(){if(!p||p.st!='replay')return;const f=p.after;p.st='done';f()}
 function flight(x0,x1,miss,cb,hi){p.st='kick';p.kf={x0,x1,t:0,T:.7+Math.abs(x1-x0)*.012,y1:26.5+miss,hi:hi||55,cb};$('bar').innerHTML='';sfx.kick()}
 /* ---------- play-by-play, defensive stats, box score ---------- */
-function say(m){const e=$('cmt');if(!e)return;e.textContent=m;e.classList?.remove('pop');void e.offsetWidth;e.classList?.add('pop')}
+function say(m){const e=$('cmt');if(!e||!e.style)return;e.textContent=m;e.classList?.remove('pop');void e.offsetWidth;e.classList?.add('pop')}
 function logPlay(gain,o,pos){const B=g.bx=g.bx||{yd:[0,0],py:[0,0],ry:[0,0],to:[0,0],sk:[0,0],tk:[0,0],ic:[0,0]},td=!o.to&&(o.td||g.ball+gain>=100),ic=o.to&&/INTERCEPT/.test(o.msg||''),sk=o.msg=='SACKED!';
 if(!o.to&&!o.inc){B.yd[pos]+=gain;(p.kind=='run'?B.ry:B.py)[pos]+=gain}if(o.to)B.to[pos]++;if(sk)B.sk[1-pos]++;if(ic)B.ic[1-pos]++;const tk=!o.inc&&!o.to&&!td&&!o.oob&&!sk;if(tk)B.tk[1-pos]++;
 if(pos==1&&!g.p2&&!g.tut){const S2=G.stats=G.stats||newStats();if(tk)S2.dtk=(S2.dtk||0)+1;if(sk)S2.dsk=(S2.dsk||0)+1;if(ic)S2.dint=(S2.dint||0)+1}
@@ -464,5 +467,6 @@ function hud(){if(!g)return;if(g.tut){$('hud').innerHTML='<span class=tm has><b 
 const dn=p?(p.def?'DEFENSE ':'')+g.down+({1:'st',2:'nd',3:'rd',4:'th'}[g.down])+' & '+(g.ball+g.togo>=100?'Goal':g.togo):'';
 $('hud').innerHTML=`<span class="tm ${g.poss==0?'has':''}"><i class=chip style="background:${TC[0].h}"></i><b class=tn>${g.names[0]}</b><b class=n>${g.score[0]}</b></span><span class=q><b>${g.q>4?'OT':'Q'+g.q}</b>${m}:${s}</span><span class=dn>${dn}</span><span class="tm ${g.poss==1?'has':''}"><b class=n>${g.score[1]}</b><b class=tn>${g.names[1]}</b><i class=chip style="background:${TC[1].h}"></i></span>`;
 $('info').textContent=`${g.wea} | WIND ${g.wind>0?'→':'←'} ${Math.abs(g.wind)} mph (affects kicks & passes) | Ball on ${g.ball<=50?'own '+g.ball:'opp '+(100-g.ball)} | TIMEOUTS ${g.to[0]}-${g.to[1]} | Morale ${G.morale} | ${DF().n}`}
-let lt=0;function loop(t){const dt=Math.min(.05,(t-lt)/1000);lt=t;resize();$('pz').style.display=g&&!g.over?'block':'none';$('cmt').style.display=g&&!g.tut?'block':'none';if(!paused){if(kk){kk.t+=dt;const m=$('mk');if(m)m.style.left=(Math.sin(kk.t*kk.sp)+1)/2*100+'%'}upd(dt)}draw();hud();requestAnimationFrame(loop)}
+let lt=0;function loop(t){requestAnimationFrame(loop);try{loop2(t)}catch(e){console.error('frame error:',e)}}
+function loop2(t){const dt=Math.min(.05,(t-lt)/1000);lt=t;resize();const e1=$('pz'),e2=$('cmt');if(e1)e1.style.display=g&&!g.over?'block':'none';if(e2)e2.style.display=g&&!g.tut?'block':'none';if(!paused){if(kk){kk.t+=dt;const m=$('mk');if(m)m.style.left=(Math.sin(kk.t*kk.sp)+1)/2*100+'%'}upd(dt)}draw();hud()}
 resize();requestAnimationFrame(loop);menu();
